@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+        
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'VT323', monospace;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+            font-size: 18px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 20px;
+            background: #fff;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .command-line {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .prompt {
+            color: #ff0000;
+            margin-right: 10px;
+        }
+
+        .content {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #0077ff;
+            color: #fff;
+        }
+
+        button {
+            background: #000;
+            color: #0077ff;
+            border: 1px solid #0077ff;
+            padding: 5px 15px;
+            font-family: 'VT323', monospace;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #0077ff;
+            color: #000;
+        }
+
+        .menu {
+            margin: 20px 0;
+        }
+
+        .section {
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .chart-container {
+            font-family: monospace;
+            white-space: pre;
+            color: #fff;
+            margin-top: 20px;
+            line-height: 1.2;
+        }
+
+        .chart-bar {
+            display: inline-block;
+            color: #0077ff;
+        }
+
+        .price-point {
+            color: #ff0000;
+        }
+
+        .glitch {
+            animation: glitch 1s linear infinite;
+        }
+
+        @keyframes glitch {
+            2%, 64% { transform: translate(2px,0) skew(0deg); }
+            4%, 60% { transform: translate(-2px,0) skew(0deg); }
+            62% { transform: translate(0,0) skew(5deg); }
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #000;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #0077ff;
+            border: 1px solid #000;
+        }
+
+        .ascii-chart {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.2;
+            letter-spacing: 2px;
+        }
+
+        .chart-title {
+            color: #0077ff;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .chart-legend {
+            color: #fff;
+            margin-top: 10px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="command-line">
+            <span class="prompt">C:\BITCOIN></span>
+            <span id="typed-text"></span>
+            <span class="cursor"></span>
+        </div>
+
+        <div class="menu">
+            <button onclick="showSection('intro')">Giới thiệu</button>
+            <button onclick="showSection('early')">Giai đoạn đầu</button>
+            <button onclick="showSection('growth')">Phát triển</button>
+            <button onclick="showSection('present')">Hiện tại</button>
+            <button onclick="showSection('chart')">Biểu đồ</button>
+        </div>
+
+        <div id="intro" class="section content"></div>
+        <div id="early" class="section content"></div>
+        <div id="growth" class="section content"></div>
+        <div id="present" class="section content"></div>
+        <div id="chart" class="section content">
+            <div class="chart-container ascii-chart" id="ascii-chart"></div>
+        </div>
+    </div>
+
+    <script>
+        const contents = {
+            intro: [
+                ">LOADING BITCOIN INTRODUCTION...",
+                "[==================================]",
+                "",
+                "Bitcoin là đồng tiền điện tử đầu tiên trên thế giới, được tạo ra bởi một người hoặc nhóm người bí ẩn với bí danh Satoshi Nakamoto vào năm 2008.",
+                "",
+                "Đây là một hệ thống thanh toán ngang hàng phi tập trung, hoạt động mà không cần bất kỳ trung gian hay tổ chức tài chính nào.",
+                "",
+                "Whitepaper được công bố vào ngày 31/10/2008, đặt nền móng cho một cuộc cách mạng trong lĩnh vực tài chính."
+            ],
+            early: [
+                ">ACCESSING EARLY HISTORY...",
+                "[==================================]",
+                "",
+                "2008: Whitepaper Bitcoin được công bố",
+                "2009: Genesis Block được đào ngày 03/01/2009",
+                "2010: Giao dịch pizza đầu tiên - 10,000 BTC",
+                "2011: Giá Bitcoin đạt 1 USD lần đầu tiên",
+                "",
+                "Thời kỳ này đánh dấu sự ra đời của các sàn giao dịch đầu tiên như Mt.Gox"
+            ],
+            growth: [
+                ">PROCESSING GROWTH PERIOD...",
+                "[==================================]",
+                "",
+                "2013: Bitcoin vượt mốc $1,000",
+                "2014-2016: Phát triển cơ sở hạ tầng",
+                "2017: Đạt đỉnh lịch sử $19,783",
+                "2018: Thị trường gấu, giá giảm 84%",
+                "",
+                "Giai đoạn này chứng kiến sự trưởng thành của hệ sinh thái Bitcoin"
+            ],
+            present: [
+                ">ANALYZING CURRENT STATUS...",
+                "[==================================]",
+                "",
+                "2020: Các tổ chức lớn bắt đầu đầu tư",
+                "2021: Tesla đầu tư 1.5 tỷ USD vào Bitcoin",
+                "2021: El Salvador chấp nhận Bitcoin là tiền tệ chính thức",
+                "2021: Đạt đỉnh mới $69,000",
+                "2022-2024: Giai đoạn tích lũy và phát triển"
+            ]
+        };
+
+        const initialTexts = [
+            "BITCOIN HISTORICAL DATABASE v2.0",
+            "INITIALIZING SYSTEM...",
+            "LOADING INTERFACE...",
+            "ACCESS GRANTED"
+        ];
+
+        function createAsciiChart() {
+            let chart = "\n";
+            chart += "╔════════════════ BITCOIN PRICE HISTORY (USD) ════════════════╗\n\n";
+            
+            const pricePoints = [
+                { year: 2009, price: 0 },
+                { year: 2011, price: 1 },
+                { year: 2013, price: 1000 },
+                { year: 2017, price: 19000 },
+                { year: 2021, price: 69000 },
+                { year: 2024, price: 40000 }
+            ];
+            
+            const maxPrice = 70000;
+            const height = 20;
+            const width = pricePoints.length * 10;
+            
+            // Create y-axis and bars
+            for (let i = height; i >= 0; i--) {
+                const price = (maxPrice / height) * i;
+                chart += `${price.toFixed(0).padStart(6, ' ')} │`;
+                
+                for (let j = 0; j < pricePoints.length; j++) {
+                    const barHeight = Math.floor((pricePoints[j].price / maxPrice) * height);
+                    if (i <= barHeight) {
+                        chart += pricePoints[j].price === maxPrice ? "╋" : "║";
+                        chart += "        ";
+                    } else {
+                        chart += "         ";
+                    }
+                }
+                chart += "\n";
+            }
+            
+            // Create x-axis
+            chart += "       ├";
+            for (let i = 0; i < pricePoints.length; i++) {
+                chart += "─────────";
+                if (i < pricePoints.length - 1) chart += "┼";
+            }
+            chart += "┤\n";
+            
+            // Add years
+            chart += "       ";
+            for (let point of pricePoints) {
+                chart += `   ${point.year}    `;
+            }
+            
+            chart += "\n\n╚═══════════════════════════════════════════════════════════╝\n";
+            chart += "\nPrice Points:\n";
+            pricePoints.forEach(point => {
+                chart += `${point.year}: $${point.price.toLocaleString()}\n`;
+            });
+            
+            return chart;
+        }
+
+        function typeInitial() {
+            if (textIndex < initialTexts.length) {
+                if (charIndex < initialTexts[textIndex].length) {
+                    document.getElementById('typed-text').innerHTML += initialTexts[textIndex].charAt(charIndex);
+                    charIndex++;
+                    setTimeout(typeInitial, 50);
+                } else {
+                    document.getElementById('typed-text').innerHTML += '<br>';
+                    textIndex++;
+                    charIndex = 0;
+                    setTimeout(typeInitial, 500);
+                }
+            }
+        }
+
+        function typeContent(element, content, index = 0, charIndex = 0) {
+            if (index < content.length) {
+                if (charIndex === 0) {
+                    element.innerHTML += '<div></div>';
+                }
+                const currentLine = element.lastElementChild;
+                
+                if (charIndex < content[index].length) {
+                    currentLine.innerHTML += content[index].charAt(charIndex);
+                    setTimeout(() => typeContent(element, content, index, charIndex + 1), 20);
+                } else {
+                    setTimeout(() => typeContent(element, content, index + 1, 0), 100);
+                }
+            }
+        }
+
+        let textIndex = 0;
+        let charIndex = 0;
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.style.display = 'none';
+                section.innerHTML = '';
+            });
+            
+            const section = document.getElementById(sectionId);
+            section.style.display = 'block';
+            
+            if (sectionId === 'chart') {
+                const chartContent = createAsciiChart();
+                const chartElement = document.getElementById('ascii-chart');
+                chartElement.textContent = ''; // Clear existing content
+                typeContent(chartElement, chartContent.split('\n'));
+            } else {
+                typeContent(section, contents[sectionId]);
+            }
+
+            section.classList.add('glitch');
+            setTimeout(() => {
+                section.classList.remove('glitch');
+            }, 1000);
+        }
+
+        window.onload = typeInitial;
+    </script>
+</body>
+  </html>
